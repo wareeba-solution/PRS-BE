@@ -1,4 +1,4 @@
-// backend/src/models/RegistrationCode.js
+//src/models/RegistrationCode.js
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 

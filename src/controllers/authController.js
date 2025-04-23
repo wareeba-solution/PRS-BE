@@ -1,6 +1,5 @@
-// src/controllers/authController.js
 const User = require('../models/User');
-// You might need to import other dependencies like bcrypt, jwt, etc.
+const { generateToken } = require('../services/tokenService');
 
 // @desc    Login user
 // @route   POST /api/auth/login
@@ -8,27 +7,35 @@ const User = require('../models/User');
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    
-    // Basic validation
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
+
+    // Find the user by email, including the password field
+    const user = await User.findOne({ email }).select('+password'); // Use .select('+password') to include the password
+
+    // Log the user object to verify it's being returned correctly
+    console.log("Found user:", user);
+
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
-    
-    // Find user logic and password comparison would go here
-    
-    res.status(200).json({ success: true, token: 'your-token-here' });
+
+    // Generate a JWT token
+    const token = generateToken({ id: user._id, role: user.role });
+
+    // Send token as response
+    res.status(200).json({ token });
   } catch (error) {
     next(error);
   }
 };
+
+
 
 // @desc    Logout user
 // @route   POST /api/auth/logout
 // @access  Private
 const logout = async (req, res, next) => {
   try {
-    // Logout logic would go here
-    
+    // Any necessary logout logic can be placed here
     res.status(200).json({ success: true, message: 'Logged out successfully' });
   } catch (error) {
     next(error);
@@ -40,8 +47,6 @@ const logout = async (req, res, next) => {
 // @access  Private
 const getMe = async (req, res, next) => {
   try {
-    // Get user logic would go here
-    
     res.status(200).json({ success: true, data: req.user });
   } catch (error) {
     next(error);
@@ -53,8 +58,7 @@ const getMe = async (req, res, next) => {
 // @access  Private
 const updatePassword = async (req, res, next) => {
   try {
-    // Update password logic would go here
-    
+    // Update password logic can be added here
     res.status(200).json({ success: true, message: 'Password updated successfully' });
   } catch (error) {
     next(error);
