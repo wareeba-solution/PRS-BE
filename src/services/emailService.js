@@ -1,25 +1,30 @@
-// backend/src/services/emailService.js
 const nodemailer = require('nodemailer');
 const config = require('../config/email');
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 /**
  * Create email transporter
+ * Uses real SMTP in production and stream transport in development
  */
-const transporter = nodemailer.createTransport({
-  host: config.host,
-  port: config.port,
-  secure: config.secure,
-  auth: {
-    user: config.user,
-    pass: config.password
-  }
-});
+const transporter = isDev
+  ? nodemailer.createTransport({
+      streamTransport: true,
+      newline: 'unix',
+      buffer: true
+    })
+  : nodemailer.createTransport({
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      auth: {
+        user: config.user,
+        pass: config.password
+      }
+    });
 
 /**
  * Send registration link to patient via email
- * @param {string} email - Patient's email address
- * @param {string} registrationLink - Registration link
- * @returns {Promise} - Nodemailer response
  */
 const sendRegistrationLink = async (email, registrationLink) => {
   try {
@@ -43,8 +48,13 @@ const sendRegistrationLink = async (email, registrationLink) => {
         </div>
       `
     };
-    
+
     const info = await transporter.sendMail(mailOptions);
+    if (isDev) {
+      console.log('📩 Simulated registration email sent:\n');
+      console.log(info.message.toString());
+    }
+
     return info;
   } catch (error) {
     console.error('Email sending error:', error);
@@ -54,9 +64,6 @@ const sendRegistrationLink = async (email, registrationLink) => {
 
 /**
  * Send registration confirmation with code
- * @param {string} email - Patient's email address
- * @param {string} registrationCode - Unique registration code
- * @returns {Promise} - Nodemailer response
  */
 const sendRegistrationConfirmation = async (email, registrationCode) => {
   try {
@@ -77,8 +84,13 @@ const sendRegistrationConfirmation = async (email, registrationCode) => {
         </div>
       `
     };
-    
+
     const info = await transporter.sendMail(mailOptions);
+    if (isDev) {
+      console.log('📩 Simulated confirmation email sent:\n');
+      console.log(info.message.toString());
+    }
+
     return info;
   } catch (error) {
     console.error('Email sending error:', error);

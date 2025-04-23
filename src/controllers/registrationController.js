@@ -21,11 +21,14 @@ const sendRegistrationLink = asyncHandler(async (req, res) => {
 
   // Generate a unique token for the registration link
   const token = require('crypto').randomBytes(32).toString('hex');
-  
-  // Create a registration link with the token
-  const registrationLink = `${process.env.FRONTEND_URL}/register/${token}`;
-  
-  // Store the token in database with expiry (24 hours)
+
+  // Construct a proper registration link
+  const registrationLink = `${process.env.FRONTEND_URL}/register/${encodeURIComponent(token)}`;
+
+  // Log the link to the terminal for development
+  console.log(`📩 Registration link for patient: ${registrationLink}`);
+
+  // Store the token in the database with expiry (24 hours)
   await RegistrationCode.create({
     code: token,
     patientData: {},
