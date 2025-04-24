@@ -336,4 +336,51 @@
  *       example:
  *         contactMethod: "email"
  *         contactValue: "patient@example.com"
+ *
+ *     RegistrationWithTokenRequest:
+ *       type: object
+ *       required:
+ *         - token
+ *         - patient
+ *         - nextOfKin
+ *       properties:
+ *         token:
+ *           type: string
+ *           description: The registration token received via email/SMS
+ *           example: "d1061a5bf41a0f5703df036c6beb64d74f9a9191b53c7103d08a103b6120ed01"
+ *         patient:
+ *           $ref: '#/components/schemas/Patient'
+ *         nextOfKin:
+ *           $ref: '#/components/schemas/NextOfKin'
+ *
+ *     VerificationCodeResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           description: Whether the operation was successful
+ *           example: true
+ *         verificationCode:
+ *           type: string
+ *           description: Verification code to present to front desk
+ *           example: "ABC123"
+ *         message:
+ *           type: string
+ *           description: Success message
+ *           example: "Patient registration successful"
+ *
+ *     PatientWithNextOfKinResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           description: Whether the operation was successful
+ *           example: true
+ *         data:
+ *           type: object
+ *           properties:
+ *             patient:
+ *               $ref: '#/components/schemas/Patient'
+ *             nextOfKin:
+ *               $ref: '#/components/schemas/NextOfKin'
  */

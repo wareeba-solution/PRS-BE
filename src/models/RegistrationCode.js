@@ -1,4 +1,4 @@
-//src/models/RegistrationCode.js
+// src/models/RegistrationCode.js
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 
@@ -20,6 +20,15 @@ const RegistrationCodeSchema = new mongoose.Schema({
     type: Date,
     required: true,
     default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days expiry
+  },
+  contactMethod: {
+    type: String,
+    enum: ['email', 'sms'],
+    required: false // Make it optional for backward compatibility
+  },
+  contactValue: {
+    type: String,
+    required: false // Make it optional for backward compatibility
   }
 }, {
   timestamps: true

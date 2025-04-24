@@ -84,44 +84,26 @@
 
 /**
  * @swagger
- * /registration:
+ * /registration/submit-with-token:
  *   post:
- *     summary: Submit patient registration
+ *     summary: Submit patient registration with token
  *     tags: [Registration]
- *     description: Submit complete registration information for a patient and next of kin
+ *     description: Submit patient registration information using the token received via email/SMS. Generates a verification code for the patient to present to front desk.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - patient
- *               - nextOfKin
- *             properties:
- *               patient:
- *                 $ref: '#/components/schemas/Patient'
- *               nextOfKin:
- *                 $ref: '#/components/schemas/NextOfKin'
+ *             $ref: '#/components/schemas/RegistrationWithTokenRequest'
  *     responses:
  *       201:
  *         description: Registration successful
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 registrationCode:
- *                   type: string
- *                   example: "ABC12345"
- *                 message:
- *                   type: string
- *                   example: "Patient registration successful"
+ *               $ref: '#/components/schemas/VerificationCodeResponse'
  *       400:
- *         description: Bad request, invalid input
+ *         description: Bad request, invalid input or expired token
  *         content:
  *           application/json:
  *             schema:
@@ -136,11 +118,11 @@
 
 /**
  * @swagger
- * /registration/{code}:
+ * /registration/verify-code/{code}:
  *   get:
- *     summary: Get registration by code
+ *     summary: Get patient by verification code
  *     tags: [Registration]
- *     description: Retrieve patient registration information using a registration code
+ *     description: Retrieve patient information using the verification code provided by the patient at front desk
  *     security:
  *       - BearerAuth: []
  *     parameters:
@@ -149,21 +131,14 @@
  *         required: true
  *         schema:
  *           type: string
- *         description: Registration code
+ *         description: Verification code provided by the patient
  *     responses:
  *       200:
- *         description: Registration found
+ *         description: Patient data retrieved successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 data:
- *                   type: object
- *                   description: Patient registration data
+ *               $ref: '#/components/schemas/PatientWithNextOfKinResponse'
  *       401:
  *         description: Not authorized
  *         content:
@@ -171,51 +146,7 @@
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *       404:
- *         description: Invalid or expired registration code
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-
-/**
- * @swagger
- * /registration/{code}/use:
- *   put:
- *     summary: Mark registration code as used
- *     tags: [Registration]
- *     description: Mark a registration code as used when patient arrives at hospital
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: code
- *         required: true
- *         schema:
- *           type: string
- *         description: Registration code
- *     responses:
- *       200:
- *         description: Registration code marked as used
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *                 message:
- *                   type: string
- *                   example: "Registration code marked as used"
- *       401:
- *         description: Not authorized
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *       404:
- *         description: Invalid registration code
+ *         description: Invalid verification code or patient not found
  *         content:
  *           application/json:
  *             schema:
